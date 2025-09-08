@@ -1,0 +1,10 @@
+@startuml
+
+class Student{
+    +registerCourse(course:Course)
+    +dropCourse(course:Course)
+}
+class Course
+
+Student "1..*" --|> Course:수강하다
+@enduml

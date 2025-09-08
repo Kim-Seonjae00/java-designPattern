@@ -1,0 +1,11 @@
+@startuml
+hide members
+hide stereotypes
+skinparam classAttributeIconSize 0
+
+class Person
+class Phone
+
+Person -right-> Phone : -homePhones
+Person -right-> Phone : -officePhones
+@enduml
