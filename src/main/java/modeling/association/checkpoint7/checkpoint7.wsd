@@ -4,6 +4,8 @@ hide member
 
 class Student
 class Course
+class Transcript
 
-Student "1..*" -- "1..*" Course : 수강하다
+Student -- "1..*" Transcript
+Transcript "1..*" -- Course
 @enduml
