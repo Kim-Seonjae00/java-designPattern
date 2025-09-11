@@ -1,5 +1,5 @@
+<!-- README: OOP 관계 정리 (Association, Generalization, Aggregation/Composition, Dependency, Realization) -->
 <h1>OOP - 클래스 간 관계</h1>
-<hr />
 
 <h2>1. 연관 (Association)</h2>
 <details>
@@ -23,16 +23,6 @@ class Order {
 </code></pre>
 </details>
 
-<details>
-  <summary>Mermaid UML</summary>
-<pre><code class="language-mermaid">
-classDiagram
-    class Customer
-    class Order
-    Order --> Customer : Association
-</code></pre>
-</details>
-
 <hr />
 
 <h2>2. 일반화 (Generalization)</h2>
@@ -53,26 +43,13 @@ class Car extends Vehicle { @Override void move() { /* ... */ } }
 </code></pre>
 </details>
 
-<details>
-  <summary>Mermaid UML</summary>
-<pre><code class="language-mermaid">
-classDiagram
-    class Vehicle {
-        +move()
-    }
-    class Car {
-        +move()
-    }
-    Vehicle <|-- Car : Generalization
-</code></pre>
-</details>
-
 <hr />
 
 <h2>3. 집합 (Aggregation & Composition)</h2>
 <details>
   <summary>설명 보기</summary>
   <ul>
+    <li>클래스들 사이의 <strong>전체-부분</strong> 관계</li>
     <li><strong>Aggregation</strong>: 전체와 부분이 느슨하게 연결, 부분은 독립적으로 존재 (빈 마름모 ◊)</li>
     <li><strong>Composition</strong>: 전체가 사라지면 부분도 함께 소멸 (채워진 마름모 ◆)</li>
   </ul>
@@ -83,19 +60,9 @@ classDiagram
 <pre><code class="language-java">
 class Player {}
 class Team {
-    private List&lt;Player&gt; members = new ArrayList&lt;&gt;();
+    private java.util.List&lt;Player&gt; members = new java.util.ArrayList&lt;&gt;();
     public void add(Player p) { members.add(p); }
 }
-</code></pre>
-</details>
-
-<details>
-  <summary>Aggregation UML</summary>
-<pre><code class="language-mermaid">
-classDiagram
-    class Player
-    class Team
-    Team o-- Player : Aggregation
 </code></pre>
 </details>
 
@@ -104,19 +71,9 @@ classDiagram
 <pre><code class="language-java">
 class OrderLine {}
 class Order {
-    private final List&lt;OrderLine&gt; lines = new ArrayList&lt;&gt;();
+    private final java.util.List&lt;OrderLine&gt; lines = new java.util.ArrayList&lt;&gt;();
     public void addLine(OrderLine l) { lines.add(l); }
 }
-</code></pre>
-</details>
-
-<details>
-  <summary>Composition UML</summary>
-<pre><code class="language-mermaid">
-classDiagram
-    class Order
-    class OrderLine
-    Order *-- OrderLine : Composition
 </code></pre>
 </details>
 
@@ -137,24 +94,10 @@ classDiagram
 <pre><code class="language-java">
 class PaymentService {
     void pay(Processor processor, long amount) {
-        processor.process(amount); 
+        processor.process(amount); // 메서드 실행 시점에만 의존
     }
 }
 interface Processor { void process(long amount); }
-</code></pre>
-</details>
-
-<details>
-  <summary>Mermaid UML</summary>
-<pre><code class="language-mermaid">
-classDiagram
-    class PaymentService {
-        +pay(processor, amount)
-    }
-    class Processor {
-        +process(amount)
-    }
-    PaymentService ..> Processor : Dependency
 </code></pre>
 </details>
 
@@ -180,20 +123,6 @@ class MemoryRepository implements Repository {
 </code></pre>
 </details>
 
-<details>
-  <summary>Mermaid UML</summary>
-<pre><code class="language-mermaid">
-classDiagram
-    class Repository {
-        +save(o)
-    }
-    class MemoryRepository {
-        +save(o)
-    }
-    Repository <|.. MemoryRepository : Realization
-</code></pre>
-</details>
-
 <hr />
 
 <h2>📌 UML 표기 요약</h2>
@@ -208,9 +137,9 @@ classDiagram
   <tbody>
     <tr><td>연관 (Association)</td><td>클래스 간 지속적 연결</td><td>실선 →</td></tr>
     <tr><td>일반화 (Generalization)</td><td>상속, IS-A 관계</td><td>빈 삼각형 화살표</td></tr>
-    <tr><td>집합 (Aggregation)</td><td>전체-부분 (독립)</td><td>빈 마름모 o--</td></tr>
-    <tr><td>합성 (Composition)</td><td>전체-부분 (종속)</td><td>채워진 마름모 *--</td></tr>
-    <tr><td>의존 (Dependency)</td><td>일시적 사용</td><td>점선 ..></td></tr>
-    <tr><td>실체화 (Realization)</td><td>인터페이스 구현</td><td>빈 삼각형 점선 <|..</td></tr>
+    <tr><td>집합 (Aggregation)</td><td>전체-부분 (독립)</td><td>빈 마름모 ◊</td></tr>
+    <tr><td>합성 (Composition)</td><td>전체-부분 (종속)</td><td>채워진 마름모 ◆</td></tr>
+    <tr><td>의존 (Dependency)</td><td>일시적 사용</td><td>점선 화살표</td></tr>
+    <tr><td>실체화 (Realization)</td><td>인터페이스 구현</td><td>빈 삼각형 + 점선</td></tr>
   </tbody>
 </table>
