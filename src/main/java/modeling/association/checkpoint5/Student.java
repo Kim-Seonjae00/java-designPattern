@@ -1,5 +1,5 @@
 package modeling.association.checkpoint5;
-import java.util.Vector
+import java.util.Vector;
 
 public class Student {
     private String name;
