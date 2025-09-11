@@ -1,0 +1,11 @@
+@startuml test
+
+class Course {
+    -id:String
+    -name:String
+    -numOfStudents:Integer=0
+    +addStudent():void
+    +deleteStudent():void
+}
+
+@enduml

@@ -1,0 +1,18 @@
+@startuml test
+
+hide method
+hide member
+
+class Computer 
+class Cpu
+class MainBoard
+class Memory
+class PowerSupply
+
+
+Cpu "1..*" --* Computer
+MainBoard --* Computer
+Memory "2,4" --* Computer
+PowerSupply --* Computer
+
+@enduml

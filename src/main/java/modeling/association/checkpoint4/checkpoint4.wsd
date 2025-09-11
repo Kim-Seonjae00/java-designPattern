@@ -1,0 +1,9 @@
+@startuml
+hide members
+hide methods
+
+class Professor
+class Student
+
+Professor "-student" -- "-professor" Student:advise
+@enduml

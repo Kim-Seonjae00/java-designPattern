@@ -1,0 +1,12 @@
+@startuml test
+
+class Person {
+    -phones:Phone
+}
+
+class Phone{
+}
+
+Person "2" --> Phone
+
+@enduml

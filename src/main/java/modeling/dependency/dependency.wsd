@@ -1,0 +1,18 @@
+@startuml
+class Person {
+    - name: String
+    - car: Car
+}
+
+class Car {
+    + drive()
+    + refuel(station: GasStation)
+}
+
+class GasStation {
+    + provideFuel()
+}
+
+Person --> Car : owns  (연관)
+Car ..> GasStation : uses (의존)
+@enduml

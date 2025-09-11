@@ -1,0 +1,9 @@
+@startuml
+
+hide member
+
+class Student
+class Course
+
+Student "1..*" -- "1..*" Course : 수강하다
+@enduml

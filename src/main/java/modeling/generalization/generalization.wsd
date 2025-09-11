@@ -1,0 +1,28 @@
+@startuml test
+
+class HomeAppliancies {
+    -serialNo:Integer
+    -manufacturer:String
+    -year:Integer
+    +turnOn():void
+    +turnOff():void
+}
+
+class Washer{
+    +turnOn():void
+    +turnOff():void
+}
+
+class Freezer{
+    +turnOn():void
+    +turnOff():void
+}
+class DishWasher{
+    +turnOn():void
+    +turnOff():void
+}
+
+Washer --|> HomeAppliancies
+Freezer --|> HomeAppliancies
+DishWasher --|> HomeAppliancies
+@enduml
