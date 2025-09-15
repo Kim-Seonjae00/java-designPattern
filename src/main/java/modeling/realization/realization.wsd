@@ -1,28 +1,16 @@
-@startuml test
-
-class HomeAppliancies {
-    -serialNo:Integer
-    -manufacturer:String
-    -year:Integer
-    +turnOn():void
-    +turnOff():void
+@startuml
+interface Flyable {
+    + fly()
 }
 
-class Washer{
-    +turnOn():void
-    +turnOff():void
+class Bird {
+    + fly()
 }
 
-class Freezer{
-    +turnOn():void
-    +turnOff():void
-}
-class DishWasher{
-    +turnOn():void
-    +turnOff():void
+class Plane {
+    + fly()
 }
 
-Washer --|> HomeAppliancies
-Freezer --|> HomeAppliancies
-DishWasher --|> HomeAppliancies
+Flyable <|.. Bird
+Flyable <|.. Plane
 @enduml
