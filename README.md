@@ -343,3 +343,379 @@ class Car extends Engine { } // 부적절, Car has-a Engine 이 맞음
 </details>
 
 </details>
+
+
+
+<details>
+  <summary><h2>3. SOLID 원칙</h2></summary>
+<details>
+  <summary>1. SRP (단일 책임 원칙, Single Responsibility Principle)</summary>
+
+  <ul>
+    <li><strong>정의</strong>: 한 클래스는 단 하나의 책임만 가져야 하며, 변경 사유는 하나여야 한다.</li>
+    <li><strong>문제 상황</strong>: 하나의 클래스가 여러 책임을 가지면 응집도가 떨어지고, 변경에 취약해진다.</li>
+  </ul>
+
+  <p><strong>❌ 잘못된 예시 (Student 클래스가 너무 많은 책임을 가짐)</strong></p>
+<pre><code class="language-java">
+public class Student {
+    public void getCourses() {}
+    public void addCourse() {}
+    public void save() {}
+    public Student load() { return this; }
+    public void printOnReportCard() {}
+    public void printOnAttendanceBook() {}
+}
+</code></pre>
+
+  <ul>
+    <li>위 <code>Student</code> 클래스는 과목 관리, 데이터베이스 접근, 출력까지 모두 포함 → 책임 과다</li>
+    <li>변경 사유가 너무 많음: 학생 고유 정보, DB 스키마 변경, 출력 형식 변화</li>
+    <li>책임이 많아질수록 코드 간 결합도가 높아지고 유지보수 어려움</li>
+  </ul>
+
+  <p><strong>✅ 개선 방향</strong></p>
+  <ul>
+    <li><code>Student</code>: 학생 고유 정보 및 수강 과목 관리 책임만 담당</li>
+    <li><code>StudentDAO</code>: 데이터베이스 저장/로드 책임 담당</li>
+    <li><code>ReportPrinter</code>, <code>AttendancePrinter</code>: 출력 형식 책임 분리</li>
+  </ul>
+
+  <hr/>
+
+  <h3>🚨 산탄총 수술 (Shotgun Surgery) 문제</h3>
+  <ul>
+    <li>한 클래스에 여러 책임을 몰아넣는 경우 외에도, <strong>하나의 책임이 여러 클래스에 분산</strong>된 경우 문제가 발생</li>
+    <li>예: 로깅, 보안, 트랜잭션 같은 <strong>횡단 관심사(Cross-Cutting Concern)</strong></li>
+    <li>부가 기능이 여러 핵심 기능에 흩어져 있으면 변경 시 모든 클래스 수정 필요 → 에러 위험 증가</li>
+  </ul>
+
+  <p><strong>✅ 해결 방법</strong></p>
+  <ul>
+    <li>부가 기능을 별도의 클래스로 분리 → 응집도 강화</li>
+    <li>방법 예시:
+      <ul>
+        <li>단순 Util/Logger 클래스 작성</li>
+        <li>전략(Strategy) 패턴 적용</li>
+        <li><strong>AOP (Aspect-Oriented Programming)</strong>: 횡단 관심사를 핵심 코드와 분리, 필요한 지점에서 자동 실행</li>
+      </ul>
+    </li>
+  </ul>
+
+</details>
+<details>
+  <summary>2. OCP (개방-폐쇄 원칙, Open-Closed Principle)</summary>
+  <ul>
+    <li><strong>정의</strong>: 클래스는 <strong>확장에는 열려(Open)</strong> 있고, <strong>변경에는 닫혀(Closed)</strong> 있어야 한다.</li>
+    <li>즉, 기존 코드를 수정하지 않고도 새로운 기능을 추가할 수 있도록 설계해야 한다.</li>
+  </ul>
+
+  <h3>핵심 아이디어</h3>
+  <ul>
+    <li>무엇이 <strong>변하는지</strong>와 무엇이 <strong>변하지 않는지</strong>를 구분한다.</li>
+    <li>예: 
+      <ul>
+        <li>변하는 것 → 출력 매체 (성적표, 출석부, 도서관 대여 명부 등)</li>
+        <li>변하지 않는 것 → "학생 정보를 출력한다"는 추상적 행위</li>
+      </ul>
+    </li>
+  </ul>
+
+  <h3>OCP 위반 예시</h3>
+  <pre><code class="language-java">
+class SomeClient {
+    public void doWork(String type) {
+        if ("report".equals(type)) {
+            System.out.println("[Report] 출력");
+        } else if ("attendance".equals(type)) {
+            System.out.println("[Attendance] 출력");
+        } else if ("library".equals(type)) {
+            System.out.println("[Library Rental] 출력");
+        }
+    }
+}
+  </code></pre>
+  <p>→ 새로운 매체가 추가될 때마다 <code>SomeClient</code>를 수정해야 하므로 OCP 위반</p>
+
+  <h3>OCP 준수 예시 (전략 패턴 활용)</h3>
+  <pre><code class="language-java">
+interface RecordPrinter { void print(); }
+
+class ReportPrinter implements RecordPrinter {
+    public void print() { System.out.println("[Report] 출력"); }
+}
+
+class AttendancePrinter implements RecordPrinter {
+    public void print() { System.out.println("[Attendance] 출력"); }
+}
+
+class LibraryRentalPrinter implements RecordPrinter {
+    public void print() { System.out.println("[Library Rental] 출력"); }
+}
+
+class SomeClient {
+    private final RecordPrinter printer;
+    public SomeClient(RecordPrinter printer) { this.printer = printer; }
+    public void doWork() { printer.print(); }
+}
+  </code></pre>
+  <p>→ <code>SomeClient</code>는 인터페이스만 알고, 새로운 매체는 클래스를 추가하면 됨 (OCP 준수)</p>
+
+  <h3>OCP와 테스트</h3>
+  <ul>
+    <li>OCP를 지키면 기존 코드가 안정적이므로 테스트 코드 수정이 최소화된다.</li>
+    <li>전략(인터페이스)을 통해 Mock 객체를 주입할 수 있어 단위 테스트가 쉬워진다.</li>
+    <li>OCP를 위반하면 조건문/분기마다 테스트 케이스를 수정해야 해 유지보수성이 떨어진다.</li>
+  </ul>
+</details>
+
+
+<details>
+  <summary>3. LSP (리스코프 치환 원칙, Liskov Substitution Principle)</summary>
+  <ul>
+    <li><strong>정의</strong>: 자식 클래스는 최소한 자신의 부모 클래스에서 가능한 행위는 수행할 수 있어야 한다.</li>
+    <li>LSP를 만족한다면, 부모 클래스의 인스턴스를 자식 클래스 인스턴스로 대체해도 프로그램 의미가 변하지 않는다.</li>
+    <li>즉, 상속 관계에서는 <strong>IS-A 관계</strong>가 성립해야 한다.</li>
+  </ul>
+
+  <h3>올바른 예시 ✅</h3>
+  <pre><code class="language-java">
+class Bird {
+    public void fly() {
+        System.out.println("새가 난다!");
+    }
+}
+
+class Sparrow extends Bird {
+    @Override
+    public void fly() {
+        System.out.println("참새가 빠르게 난다!");
+    }
+}
+
+public class LSPDemo {
+    public static void main(String[] args) {
+        Bird bird = new Sparrow(); // 부모 타입으로 자식 대체
+        bird.fly(); // 정상 동작 (LSP 만족)
+    }
+}
+  </code></pre>
+  <p>→ <code>Sparrow</code>는 <code>Bird</code>가 가진 행위를 모두 올바르게 수행할 수 있으므로 LSP 만족</p>
+
+  <h3>잘못된 예시 ❌</h3>
+  <pre><code class="language-java">
+class Bird {
+    public void fly() {
+        System.out.println("새가 난다!");
+    }
+}
+
+class Penguin extends Bird {
+    @Override
+    public void fly() {
+        throw new UnsupportedOperationException("펭귄은 날 수 없다!"); 
+    }
+}
+
+public class LSPViolation {
+    public static void main(String[] args) {
+        Bird bird = new Penguin(); // 부모 타입으로 자식 대체
+        bird.fly(); // 예외 발생 → 프로그램 의미가 깨짐 (LSP 위반)
+    }
+}
+  </code></pre>
+  <p>→ <code>Penguin</code>은 부모 클래스의 계약을 깨뜨리므로 LSP 위반</p>
+
+  <h3>펭귄 문제 해결 (인터페이스 활용) 🐧</h3>
+  <pre><code class="language-java">
+// 새라는 공통 개념
+abstract class Bird { }
+
+// "날 수 있는 새"는 별도의 인터페이스로 분리
+interface Flyable {
+    void fly();
+}
+
+class Sparrow extends Bird implements Flyable {
+    @Override
+    public void fly() {
+        System.out.println("참새가 난다!");
+    }
+}
+
+class Penguin extends Bird {
+    // Flyable을 구현하지 않음 → 날 수 없는 새를 자연스럽게 표현
+}
+
+public class LSPFixed {
+    public static void main(String[] args) {
+        Flyable sparrow = new Sparrow();
+        sparrow.fly();
+        Bird penguin = new Penguin();
+        // penguin.fly()를 강요하지 않음 → 계약 위반 없음
+    }
+}
+  </code></pre>
+  <p>→ <code>Bird</code>는 "새"의 일반적 개념만 표현하고, 
+     <code>Flyable</code> 인터페이스를 통해 "날 수 있는 새"만 따로 구분함.</p>
+
+  <h3>핵심 요약</h3>
+  <ul>
+    <li>LSP는 부모의 계약을 자식이 어기지 않도록 하는 원칙.</li>
+    <li>잘못된 상속 관계는 <strong>인터페이스 분리</strong>나 <strong>구성(Composition)</strong>으로 해결할 수 있다.</li>
+    <li>부모 클래스 설계를 더 추상화하여 계약을 명확히 하는 것이 중요하다.</li>
+  </ul>
+</details>
+
+<details>
+  <summary>4. ISP (인터페이스 분리 원칙, Interface Segregation Principle)</summary>
+  <ul>
+    <li><strong>정의</strong>: 클라이언트는 자신이 사용하지 않는 메서드에 의존하지 않아야 한다.</li>
+    <li>즉, <strong>인터페이스는 작게, 구체적으로 분리</strong>해야 하며, 불필요한 기능을 강요하면 안 된다.</li>
+    <li>하나의 큰 인터페이스보다 여러 개의 작은 인터페이스가 더 낫다.</li>
+  </ul>
+
+  <h3>잘못된 예시 ❌</h3>
+  <pre><code class="language-java">
+// 너무 큰 인터페이스
+interface Machine {
+    void print();
+    void scan();
+    void fax();
+}
+
+// 어떤 클라이언트는 print만 필요
+class SimplePrinter implements Machine {
+    @Override
+    public void print() { System.out.println("문서 출력"); }
+    @Override
+    public void scan() { throw new UnsupportedOperationException(); }
+    @Override
+    public void fax() { throw new UnsupportedOperationException(); }
+}
+  </code></pre>
+  <p>→ <code>SimplePrinter</code>는 사용하지 않는 <code>scan</code>, <code>fax</code> 메서드를 억지로 구현해야 하므로 ISP 위반</p>
+
+  <h3>올바른 예시 ✅</h3>
+  <pre><code class="language-java">
+// 인터페이스를 기능별로 분리
+interface Printer {
+    void print();
+}
+
+interface Scanner {
+    void scan();
+}
+
+interface Fax {
+    void fax();
+}
+
+// 클라이언트는 자신에게 필요한 인터페이스만 구현
+class SimplePrinter implements Printer {
+    @Override
+    public void print() { System.out.println("문서 출력"); }
+}
+
+class MultiFunctionPrinter implements Printer, Scanner, Fax {
+    @Override
+    public void print() { System.out.println("문서 출력"); }
+    @Override
+    public void scan() { System.out.println("문서 스캔"); }
+    @Override
+    public void fax() { System.out.println("팩스 전송"); }
+}
+  </code></pre>
+  <p>→ <code>SimplePrinter</code>는 필요한 <code>Printer</code>만, 
+     <code>MultiFunctionPrinter</code>는 여러 인터페이스를 조합해 사용. ISP 준수</p>
+
+  <h3>핵심 요약</h3>
+  <ul>
+    <li>인터페이스는 클라이언트 맞춤형으로 작게 분리해야 한다.</li>
+    <li>불필요한 의존성을 줄여 시스템을 더 유연하고 유지보수하기 쉽게 만든다.</li>
+    <li>큰 인터페이스 = 강한 결합 / 작은 인터페이스 = 낮은 결합</li>
+  </ul>
+</details>
+
+<details>
+  <summary>5. DIP (의존 역전 원칙, Dependency Inversion Principle)</summary>
+  <ul>
+    <li><strong>정의</strong>: 고수준 모듈(정책, 비즈니스 로직)은 저수준 모듈(구현 세부사항)에 의존하지 않아야 한다.</li>
+    <li>둘 다 <strong>추상화(인터페이스, 추상 클래스)</strong>에 의존해야 한다.</li>
+    <li>즉, "구체적인 클래스에 의존하지 말고, 추상화에 의존하라."</li>
+  </ul>
+
+  <h3>위반 예시 ❌</h3>
+  <pre><code class="language-java">
+// 고수준 모듈: 결제 서비스
+class PaymentService {
+    private final CreditCardProcessor processor = new CreditCardProcessor();
+    public void pay(long amount) {
+        processor.process(amount); // 특정 구현체에 직접 의존
+    }
+}
+
+// 저수준 모듈: 구체 구현
+class CreditCardProcessor {
+    public void process(long amount) {
+        System.out.println("신용카드 결제: " + amount);
+    }
+}
+  </code></pre>
+  <p>→ <code>PaymentService</code>가 <code>CreditCardProcessor</code>에 직접 의존 → DIP 위반</p>
+
+  <h3>올바른 예시 ✅</h3>
+  <pre><code class="language-java">
+// 추상화
+interface PaymentProcessor {
+    void process(long amount);
+}
+
+// 저수준 모듈: 구현체
+class CreditCardProcessor implements PaymentProcessor {
+    @Override
+    public void process(long amount) {
+        System.out.println("신용카드 결제: " + amount);
+    }
+}
+
+class PayPalProcessor implements PaymentProcessor {
+    @Override
+    public void process(long amount) {
+        System.out.println("PayPal 결제: " + amount);
+    }
+}
+
+// 고수준 모듈: 추상화에 의존
+class PaymentService {
+    private final PaymentProcessor processor;
+    public PaymentService(PaymentProcessor processor) {
+        this.processor = processor; // 구체 구현체를 주입 (DI)
+    }
+    public void pay(long amount) {
+        processor.process(amount);
+    }
+}
+
+// 실행
+public class DIPDemo {
+    public static void main(String[] args) {
+        PaymentService cardService = new PaymentService(new CreditCardProcessor());
+        cardService.pay(1000);
+        PaymentService paypalService = new PaymentService(new PayPalProcessor());
+        paypalService.pay(2000);
+    }
+}
+  </code></pre>
+  <p>→ <code>PaymentService</code>는 <code>PaymentProcessor</code> 인터페이스에만 의존 → DIP 준수</p>
+
+  <h3>핵심 요약</h3>
+  <ul>
+    <li>DIP는 고수준 모듈과 저수준 모듈 모두 <strong>추상화</strong>에 의존하게 만드는 원칙이다.</li>
+    <li>이를 실현하는 기법이 <strong>DI(Dependency Injection, 의존성 주입)</strong>이다.</li>
+    <li>결과적으로 유연한 확장, 테스트 용이성, 낮은 결합도를 얻을 수 있다.</li>
+  </ul>
+</details>
+
+
+</details>
